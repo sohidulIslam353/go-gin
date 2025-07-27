@@ -8,6 +8,6 @@ import (
 
 func IndexPage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Thanks for using gingonic with bun.",
+		"message": "Welcome To Gin Ecommerce API.",
 	})
 }

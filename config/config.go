@@ -36,5 +36,9 @@ func LoadConfig() {
 		log.Fatalf("❌ Failed to unmarshal config: %v", err)
 	}
 
+	// Checking if JWT_SECRET is set
+	// jwtKey := []byte(viper.GetString("JWT_SECRET.secret"))
+	// log.Println("JWT Key:", string(jwtKey))
+
 	log.Println("✅ Config loaded successfully")
 }

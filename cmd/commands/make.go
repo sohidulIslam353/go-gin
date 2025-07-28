@@ -16,6 +16,23 @@ func {{.ControllerName}}(c *gin.Context) {
 }
 `
 
+const modelTemplate = `package models
+
+	import (
+		"time"
+
+		"github.com/uptrace/bun"
+	)
+
+	type {{.ModelName}} struct {
+		bun.BaseModel ` + "`bun:\"table:{{.TableName}}s\"`" + `
+		ID        int64     ` + "`bun:\"id,pk,autoincrement\"`" + `
+		Name      string    ` + "`bun:\"name,notnull\"`" + `
+		CreatedAt time.Time ` + "`bun:\"created_at,default:now()\"`" + `
+		UpdatedAt time.Time ` + "`bun:\"updated_at,default:now()\"`" + `
+	}
+`
+
 func main() {
 	if len(os.Args) < 3 {
 		fmt.Println("Usage: go run cmd/commands/make.go controller ControllerName")
@@ -64,6 +81,7 @@ func createController(name string) {
 
 func createModel(name string) {
 	modelName := strings.Title(name)
+	tableName := strings.ToLower(name)
 	fileName := strings.ToLower(name) + ".go"
 	filePath := "internal/models/" + fileName
 
@@ -81,26 +99,10 @@ func createModel(name string) {
 	}
 	defer f.Close()
 
-	modelTemplate := `package models
-
-	import (
-		"time"
-
-		"github.com/uptrace/bun"
-	)
-
-	type {{.ModelName}} struct {
-		bun.BaseModel ` + "`bun:\"table:{{.ModelName}}s\"`" + `
-		ID        int64     ` + "`bun:\"id,pk,autoincrement\"`" + `
-		Name      string    ` + "`bun:\"name,notnull\"`" + `
-		CreatedAt time.Time ` + "`bun:\"created_at,default:now()\"`" + `
-		UpdatedAt time.Time ` + "`bun:\"updated_at,default:now()\"`" + `
-	}
-	`
-
 	tmpl, _ := template.New("model").Parse(modelTemplate)
 	tmpl.Execute(f, map[string]string{
 		"ModelName": modelName,
+		"TableName": tableName,
 	})
 
 	fmt.Println("✅ Model created at:", filePath)

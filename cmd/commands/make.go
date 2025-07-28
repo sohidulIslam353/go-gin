@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"gin-bun-cockroach/internal/helpers"
 	"os"
 	"strings"
 	"text/template"
 )
 
+// This template is for creating a basic controller in a Gin web application
 const controllerTemplate = `package controllers
 
 import "github.com/gin-gonic/gin"
@@ -16,6 +18,7 @@ func {{.ControllerName}}(c *gin.Context) {
 }
 `
 
+// This template is for creating a basic model with Bun ORM
 const modelTemplate = `package models
 
 	import (
@@ -33,9 +36,34 @@ const modelTemplate = `package models
 	}
 `
 
+// Middleware for creating a controller or model in a Go web application
+const middlewareTemplate = `package middleware
+
+import (
+	"net/http"
+	"github.com/gin-gonic/gin"
+)
+
+func {{.MiddlewareName}}() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// TODO: implement middleware logic here
+
+		// Example logic (remove or customize this):
+		if c.GetHeader("Authorization") == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+
+		c.Next()
+	}
+}
+`
+
 func main() {
 	if len(os.Args) < 3 {
 		fmt.Println("Usage: go run cmd/commands/make.go controller ControllerName")
+		fmt.Println("  go run cmd/commands/make.go model ModelName")
+		fmt.Println("  go run cmd/commands/make.go middleware MiddlewareName")
 		return
 	}
 
@@ -47,6 +75,8 @@ func main() {
 		createController(name)
 	case "model":
 		createModel(name)
+	case "middleware":
+		createMiddleware(name)
 	default:
 		fmt.Println("Unknown command:", command)
 	}
@@ -80,7 +110,7 @@ func createController(name string) {
 }
 
 func createModel(name string) {
-	modelName := strings.Title(name)
+	modelName := helpers.ToTitleCase(name)
 	tableName := strings.ToLower(name)
 	fileName := strings.ToLower(name) + ".go"
 	filePath := "internal/models/" + fileName
@@ -106,4 +136,31 @@ func createModel(name string) {
 	})
 
 	fmt.Println("✅ Model created at:", filePath)
+}
+
+func createMiddleware(name string) {
+	middlewareName := helpers.ToTitleCase(name)
+	fileName := strings.ToLower(name) + ".go"
+	filePath := "internal/api/http/middleware/" + fileName
+
+	_ = os.MkdirAll("internal/api/http/middleware", os.ModePerm)
+
+	if _, err := os.Stat(filePath); err == nil {
+		fmt.Println("⚠️ Middleware already exists:", filePath)
+		return
+	}
+
+	f, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println("❌ Error creating middleware:", err)
+		return
+	}
+	defer f.Close()
+
+	tmpl, _ := template.New("middleware").Parse(middlewareTemplate)
+	tmpl.Execute(f, map[string]string{
+		"MiddlewareName": middlewareName,
+	})
+
+	fmt.Println("✅ Middleware created at:", filePath)
 }

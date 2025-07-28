@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"gin-bun-cockroach/internal/helpers"
+	"gin-bun-cockroach/internal/utils"
 	"os"
 	"strings"
 	"text/template"
@@ -110,7 +110,7 @@ func createController(name string) {
 }
 
 func createModel(name string) {
-	modelName := helpers.ToTitleCase(name)
+	modelName := utils.ToTitleCase(name)
 	tableName := strings.ToLower(name)
 	fileName := strings.ToLower(name) + ".go"
 	filePath := "internal/models/" + fileName
@@ -139,7 +139,7 @@ func createModel(name string) {
 }
 
 func createMiddleware(name string) {
-	middlewareName := helpers.ToTitleCase(name)
+	middlewareName := utils.ToTitleCase(name)
 	fileName := strings.ToLower(name) + ".go"
 	filePath := "internal/api/http/middleware/" + fileName
 

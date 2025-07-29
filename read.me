@@ -1,0 +1,123 @@
+# Gin + CockroachDB + JWT Auth Starter
+
+A simple starter boilerplate for building secure APIs using Gin framework, CockroachDB, and JWT-based authentication.
+
+---
+
+## 📁 Folder Structure
+
+```
+.
+├── README.md
+├── cmd
+│   ├── commands
+│   │   ├── make.go
+│   ├── main.go
+├── config
+│   ├── config.go
+│   ├── config.yaml
+│   ├── database.go
+│   ├── redis.go
+├── internal
+│   ├── api
+│   │   ├── http
+│   │   │   ├── controllers
+│   │   │   ├── middlewares
+│   │   │   └── auth
+│   │── database 
+│   │   └── database.go
+│   │── models
+│   │   └── all models
+│   │── pkg
+│   │   │   └── router
+│   │   │       ├── router.go
+│   │── routes
+│   │   │   ├── module.go
+│   │   │   └── v1 
+│   │   │       └── v1.go
+│   │── utils
+│   │   │   ├── common_helper.go
+│   │   │   ├── auth_helper.go
+├── migrations
+├── temp
+├── go.mod
+├── go.sum
+└── air.toml
+```
+
+    
+---
+
+## ⚙️ Requirements
+
+- Go 1.18+
+- CockroachDB for database or KeyDB/Redis for cache (as Redis alternative for token blacklist)
+- Git
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the project
+
+```bash
+git clone https://github.com/sohidulIslam353/go-gin.git
+cd project_folder
+
+### 2. Create config/config.yaml
+
+```yaml
+database:
+  host: "localhost"
+  port: 26257
+  user: "yourusername" 
+  password: "database password"
+  name: "database name"
+
+JWT_SECRET:
+  secret: super_secret_2025_key!@#  // create manual token secret key
+
+```
+### 3. Install dependencies
+
+```bash
+go mod tidy
+```
+
+### 4. Run the server   
+
+```bash
+go run cmd/main.go  // if you are not using air
+
+air   // if you are using air (recommended)
+
+```
+🛠 Generate Controller
+
+```bash
+go run cmd/commands/make.go controller controller_name // student_controller
+
+```
+
+🛠 Generate Model
+
+```bash
+go run cmd/commands/make.go model model_name // student
+
+```
+
+🛠 Generate Middleware
+
+```bash
+go run cmd/commands/make.go middleware middleware_name // auth_middleware
+
+```
+🛠 Genrate scheema file via goose library
+
+```bash
+goose -dir ./migrations create create_categories_table sql   [create schema file for migrations]
+
+goose -dir ./migrations postgres "postgresql://root@localhost:26257/project_cockroach?sslmode=disable" up  [run all migrations]
+
+** make sure pass the correct database name , user , passowrd , etc on up command for migrate scheema file **
+```
